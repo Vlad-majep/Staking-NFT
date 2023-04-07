@@ -116,7 +116,7 @@ contract Staking is ReentrancyGuard {
     nftCollection.transferFrom(address(this), msg.sender, _tokenId);
   }
 
-  function claimRewards() external {
+  function claimRewards() external returns(uint) {
     uint rewards = calculateRewards(msg.sender) + stakers[msg.sender].unclaimedRewards;
 
     require(rewards > 0, "You have no rewards to claim");
@@ -125,6 +125,7 @@ contract Staking is ReentrancyGuard {
     stakers[msg.sender].unclaimedRewards = 0;
 
     rewardsToken.safeTransfer(msg.sender, rewards);
+    return rewards;
   }
 
   function calculateRewards (address _staker) internal view returns(uint _rewards) {
@@ -139,7 +140,7 @@ contract Staking is ReentrancyGuard {
     return rewards;
   }
 
-  function getStakedTokens(address _user) public view returns(StakedToken[] memory){
+  function getStakedTokens(address _user) external view returns(StakedToken[] memory){
     if (stakers[_user].amountStaked > 0) {
       StakedToken[] memory _stakedTokens = new StakedToken[](stakers[_user].amountStaked);
       uint _index = 0;
